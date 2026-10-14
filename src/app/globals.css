@@ -1,0 +1,195 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Mode - Crisp, clean, elevated surface aesthetic */
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 158 64% 40%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 93.5%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 93.5%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 210 40% 94%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214 32% 88%;
+    --input: 214 32% 88%;
+    --ring: 158 64% 40%;
+
+    --radius: 0.75rem;
+
+    /* Spatial UI Variables - Light */
+    --spatial-glass-bg: rgba(255, 255, 255, 0.75);
+    --spatial-glass-border: rgba(226, 232, 240, 0.8);
+    --spatial-glass-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.08);
+    --spatial-surface-elevated: rgba(255, 255, 255, 0.9);
+    --spatial-glow: rgba(16, 185, 129, 0.15);
+  }
+
+  .dark {
+    /* Dark Mode - Deep Slate & Banking Midnight with Emerald accents */
+    --background: 224 71% 4%;
+    --foreground: 210 40% 98%;
+
+    --card: 224 50% 7.5%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 224 50% 8%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 158 64% 48%;
+    --primary-foreground: 224 71% 4%;
+
+    --secondary: 222 40% 13%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 222 40% 13%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 222 40% 15%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 350 89% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 222 35% 16%;
+    --input: 222 35% 16%;
+    --ring: 158 64% 48%;
+
+    /* Spatial UI Variables - Dark */
+    --spatial-glass-bg: rgba(11, 15, 25, 0.65);
+    --spatial-glass-border: rgba(255, 255, 255, 0.08);
+    --spatial-glass-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+    --spatial-surface-elevated: rgba(17, 24, 39, 0.7);
+    --spatial-glow: rgba(16, 185, 129, 0.25);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-emerald-500/20 selection:text-emerald-400;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    min-height: 100vh;
+  }
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.25);
+  border-radius: 9999px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.5);
+}
+
+/* Spatial UI / Glassmorphism Components */
+@layer components {
+  .spatial-glass {
+    background: var(--spatial-glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--spatial-glass-border);
+    box-shadow: var(--spatial-glass-shadow);
+  }
+
+  .spatial-card {
+    background: var(--spatial-glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--spatial-glass-border);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.12);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+
+  .spatial-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(800px circle at var(--mouse-x, 100px) var(--mouse-y, 100px), rgba(255, 255, 255, 0.06), transparent 40%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .spatial-card:hover::before {
+    opacity: 1;
+  }
+
+  .spatial-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.2), 0 0 20px 0 var(--spatial-glow);
+    border-color: rgba(16, 185, 129, 0.3);
+  }
+
+  /* Ambient Mesh Background for Spatial Banking Depth */
+  .spatial-ambient-mesh {
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.07) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+  }
+
+  .dark .spatial-ambient-mesh {
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(14, 116, 144, 0.1) 0px, transparent 50%),
+      radial-gradient(at 50% 100%, rgba(16, 185, 129, 0.06) 0px, transparent 50%);
+  }
+
+  /* Skeleton Shimmer Gradient */
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 0%,
+      rgba(255, 255, 255, 0.09) 50%,
+      rgba(255, 255, 255, 0.03) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .light .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.04) 0%,
+      rgba(0, 0, 0, 0.08) 50%,
+      rgba(0, 0, 0, 0.04) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
