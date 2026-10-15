@@ -15,6 +15,7 @@ import {
   Menu,
   X,
   PlusCircle,
+  TerminalSquare,
 } from "lucide-react";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -83,6 +84,16 @@ export function Navbar() {
               >
                 Transfers
               </Link>
+              {/* Admin Panel -- only visible to system users */}
+              {user?.systemUser && (
+                <Link
+                  href="/admin"
+                  className="px-3 py-1.5 text-xs font-semibold rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-rose-500/20 hover:border-rose-500/40 transition-all flex items-center gap-1.5"
+                >
+                  <TerminalSquare className="w-3 h-3" />
+                  Admin
+                </Link>
+              )}
             </nav>
           </div>
 
@@ -216,6 +227,12 @@ export function Navbar() {
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                         Verified Active Session
                       </div>
+                      {user?.systemUser && (
+                        <div className="mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                          <TerminalSquare className="w-2.5 h-2.5" />
+                          System Operator
+                        </div>
+                      )}
                     </div>
 
                     <div className="py-2 space-y-1">
@@ -227,6 +244,17 @@ export function Navbar() {
                         <UserIcon className="w-3.5 h-3.5 text-muted-foreground" />
                         <span>Security & Profile</span>
                       </Link>
+                      {/* Admin Panel link -- system users only */}
+                      {user?.systemUser && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          className="flex items-center space-x-2.5 px-2.5 py-1.5 rounded-lg text-xs text-rose-400 hover:bg-rose-500/10 transition-colors font-semibold"
+                        >
+                          <TerminalSquare className="w-3.5 h-3.5" />
+                          <span>Admin Panel</span>
+                        </Link>
+                      )}
                     </div>
 
                     <div className="pt-2 border-t border-border/40">
@@ -307,6 +335,17 @@ export function Navbar() {
           >
             Transfers
           </Link>
+          {/* Admin Panel -- only visible to system users */}
+          {user?.systemUser && (
+            <Link
+              href="/admin"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-rose-400 hover:bg-rose-500/10 border border-rose-500/20"
+            >
+              <TerminalSquare className="w-4 h-4" />
+              Admin Panel
+            </Link>
+          )}
         </div>
       )}
     </header>

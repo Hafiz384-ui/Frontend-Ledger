@@ -15,8 +15,10 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/accounts") ||
     pathname.startsWith("/transactions") ||
+    pathname.startsWith("/transfer") ||
     pathname.startsWith("/transfers") ||
-    pathname.startsWith("/profile");
+    pathname.startsWith("/profile") ||
+    pathname.startsWith("/admin");
 
   // If trying to access protected route without token -> redirect to /login
   if (isProtectedPath && !token) {
@@ -44,7 +46,9 @@ export const config = {
     "/register",
     "/accounts/:path*",
     "/transactions/:path*",
+    "/transfer/:path*",
     "/transfers/:path*",
     "/profile/:path*",
+    "/admin/:path*",
   ],
 };

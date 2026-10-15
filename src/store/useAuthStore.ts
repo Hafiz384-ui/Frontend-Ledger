@@ -47,6 +47,7 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true, error: null });
         try {
           const data = await authApi.login(credentials);
+          console.log(data)
           localStorage.setItem("banking_token", data.token);
           syncTokenToCookie(data.token);
 

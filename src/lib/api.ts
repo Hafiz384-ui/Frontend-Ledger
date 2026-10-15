@@ -1,6 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import type { AuthResponse, LoginCredentials, LogoutResponse, RegisterCredentials } from "@/types/auth";
 import type { AccountListResponse, BalanceResponse, CreateAccountResponse } from "@/types/account";
+import type { CreateTransactionRequest, Transaction, TransactionResponse } from "@/types/transaction";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
@@ -51,6 +52,7 @@ apiClient.interceptors.response.use(
       const networkError = new Error(
         "Banking server unreachable. Please check your network connection or server status."
       );
+      (networkError as unknown as { status: number }).status = 0;
       return Promise.reject(networkError);
     }
 
@@ -106,7 +108,9 @@ apiClient.interceptors.response.use(
     }
 
     const customError = new Error(serverMessage);
-    (customError as unknown as { status: number }).status = status;
+    (customError as unknown as { status: number; data?: unknown; response?: unknown }).status = status;
+    (customError as unknown as { status: number; data?: unknown; response?: unknown }).data = data;
+    (customError as unknown as { status: number; data?: unknown; response?: unknown }).response = error.response;
     return Promise.reject(customError);
   }
 );
@@ -148,4 +152,45 @@ export const accountApi = {
   },
 };
 
+export const transactionApi = {
+  createTransaction: async (
+    payload: CreateTransactionRequest
+  ): Promise<{ status: number; data: TransactionResponse }> => {
+    const response = await apiClient.post<TransactionResponse>("/api/transactions", payload);
+    return {
+      status: response.status,
+      data: response.data,
+    };
+  },
+
+  getTransactions: async (params?: { accountId?: string; limit?: number }): Promise<Transaction[]> => {
+    const response = await apiClient.get<{ transactions: Transaction[] } | Transaction[]>("/api/transactions", {
+      params,
+    });
+    if (Array.isArray(response.data)) {
+      return response.data;
+    }
+    return (response.data as { transactions?: Transaction[] }).transactions || [];
+  },
+};
+
+export const systemApi = {
+  /**
+   * Seed initial funds into a user account (systemUser only).
+   * POST /api/transactions/system/initial-funds
+   */
+  seedInitialFunds: async (payload: {
+    toAccount: string;
+    amount: number;
+    idempotencyKey: string;
+  }): Promise<{ message: string; transaction?: Record<string, unknown> }> => {
+    const response = await apiClient.post<{
+      message: string;
+      transaction?: Record<string, unknown>;
+    }>("/api/transactions/system/initial-funds", payload);
+    return response.data;
+  },
+};
+
 export default apiClient;
+
