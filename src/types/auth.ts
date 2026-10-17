@@ -1,8 +1,13 @@
+/**
+ * Authentication Type Definitions
+ * DTOs and entity representations for users and session management
+ */
+
 export interface User {
   _id: string;
   username: string;
   email: string;
-  systemUser?: boolean;
+  systemUser: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

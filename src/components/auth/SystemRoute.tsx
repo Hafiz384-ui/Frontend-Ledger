@@ -18,7 +18,6 @@ interface SystemRouteProps {
 export function SystemRoute({ children }: SystemRouteProps) {
   const router = useRouter();
   const { user, isAuthenticated, hasHydrated } = useAuthStore();
-  console.log(user);
   // Track mount state to prevent SSR/hydration flicker
   const [mounted, setMounted] = useState(false);
 

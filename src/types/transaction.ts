@@ -1,7 +1,14 @@
+/**
+ * Transaction Type Definitions
+ * Represents financial transfers, state transitions, and seeding payloads
+ */
+
 export type TransactionStatus =
   | "PENDING"
   | "COMPLETED"
+  | "FAILURE"
   | "FAILED"
+  | "REVERSED"
   | "REJECTED"
   | "ROLLED_BACK";
 
@@ -31,4 +38,22 @@ export interface TransactionResponse {
   accountId?: string;
   balance?: number;
   [key: string]: unknown;
+}
+
+export interface SeedFundsRequest {
+  toAccount: string;
+  amount: number;
+  idempotencyKey: string;
+}
+
+export interface SeedFundsResponse {
+  message: string;
+  transaction?: Transaction | Record<string, unknown>;
+}
+
+export interface TransactionQueryParams {
+  accountId?: string;
+  limit?: number;
+  skip?: number;
+  status?: TransactionStatus;
 }
