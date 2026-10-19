@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import type { Account } from "@/types/account";
 import { accountApi } from "@/lib/api";
+import { useAuthStore } from "./useAuthStore";
+import { toast } from "./useToastStore";
 
 interface AccountState {
   accounts: Account[];
@@ -89,6 +91,20 @@ export const useAccountStore = create<AccountState>((set, get) => ({
   },
 
   createAccount: async () => {
+    // Hard restriction: System user (Admin) is not allowed to open new accounts
+    const currentUser = useAuthStore.getState().user;
+    if (currentUser?.systemUser) {
+      toast.error(
+        "System users (Admins) are not allowed to open new accounts. System user account is reserved for initial funds seeding.",
+        "Operation Restricted"
+      );
+      set({
+        error: "System users (Admins) cannot open new accounts.",
+        isCreating: false,
+      });
+      return null;
+    }
+
     set({ isCreating: true, error: null });
     try {
       const data = await accountApi.createAccount();

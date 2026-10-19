@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   Copy,
   Check,
@@ -13,6 +14,8 @@ import {
   Eye,
   EyeOff,
   ExternalLink,
+  TerminalSquare,
+  ShieldAlert,
 } from "lucide-react";
 import type { Account, AccountStatus } from "@/types/account";
 import { useAccountStore } from "@/store/useAccountStore";
@@ -24,6 +27,7 @@ interface AccountCardProps {
   onOpenDetails: (account: Account) => void;
   onSendMoney: (account: Account) => void;
   hideBalance?: boolean;
+  isSystemUser?: boolean;
 }
 
 export function AccountCard({
@@ -31,6 +35,7 @@ export function AccountCard({
   onOpenDetails,
   onSendMoney,
   hideBalance = false,
+  isSystemUser = false,
 }: AccountCardProps) {
   const { balances, isBalanceLoading, fetchBalance, activeAccount, setActiveAccount } =
     useAccountStore();
@@ -107,19 +112,21 @@ export function AccountCard({
           <div className="flex items-center space-x-2.5">
             <div
               className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
-                isSelected
+                isSystemUser
+                  ? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
+                  : isSelected
                   ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
                   : "bg-muted/60 text-muted-foreground border border-border/40 group-hover:text-foreground"
               }`}
             >
-              <Layers className="w-4 h-4" />
+              {isSystemUser ? <ShieldAlert className="w-4 h-4 text-rose-400" /> : <Layers className="w-4 h-4" />}
             </div>
             <div>
               <span className="text-xs font-bold text-foreground block tracking-tight">
-                Primary Vault
+                {isSystemUser ? "System Reserve Vault" : "Primary Vault"}
               </span>
               <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-                {account.currency || "INR"} Account
+                {isSystemUser ? "Seeding Liquidity Reserve" : `${account.currency || "INR"} Account`}
               </span>
             </div>
           </div>
@@ -163,7 +170,7 @@ export function AccountCard({
       <div className="my-6 space-y-1">
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-            Ledger Balance
+            {isSystemUser ? "Reserve Ledger Balance" : "Ledger Balance"}
           </span>
           {isLoadingBalance && (
             <span className="text-[10px] text-emerald-400 flex items-center gap-1 animate-pulse font-medium">
@@ -178,7 +185,7 @@ export function AccountCard({
         </h3>
       </div>
 
-      {/* Bottom: Quick Actions (Check Balance & Send Money) */}
+      {/* Bottom: Quick Actions (Check Balance & Send Money / Seed Funds) */}
       <div className="pt-4 border-t border-border/40 flex items-center justify-between gap-2">
         <button
           type="button"
@@ -192,18 +199,30 @@ export function AccountCard({
           <span>Check Balance</span>
         </button>
 
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onSendMoney(account);
-          }}
-          disabled={account.status !== "ACTIVE"}
-          className="flex-1 flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold hover:bg-emerald-400 shadow-spatial-glow-emerald transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          <Send className="w-3.5 h-3.5" />
-          <span>Send Money</span>
-        </button>
+        {isSystemUser ? (
+          <Link
+            href="/admin"
+            onClick={(e) => e.stopPropagation()}
+            className="flex-1 flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 text-slate-950 text-xs font-bold hover:opacity-90 shadow-spatial-glow-rose transition-all"
+            title="Seed Initial Funds from Admin Panel"
+          >
+            <TerminalSquare className="w-3.5 h-3.5" />
+            <span>Seed Funds</span>
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSendMoney(account);
+            }}
+            disabled={account.status !== "ACTIVE"}
+            className="flex-1 flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold hover:bg-emerald-400 shadow-spatial-glow-emerald transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Send className="w-3.5 h-3.5" />
+            <span>Send Money</span>
+          </button>
+        )}
 
         <button
           type="button"

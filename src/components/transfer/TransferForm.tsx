@@ -21,7 +21,11 @@ import {
   RotateCcw,
   Loader2,
   FileText,
+  TerminalSquare,
+  ShieldAlert,
 } from "lucide-react";
+import Link from "next/link";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useAccountStore } from "@/store/useAccountStore";
 import { toast } from "@/store/useToastStore";
 import { transactionApi } from "@/lib/api";
@@ -43,6 +47,9 @@ export function TransferForm({
   onCancel,
   isModal = false,
 }: TransferFormProps) {
+  const { user } = useAuthStore();
+  const isSystemUser = Boolean(user?.systemUser);
+
   const {
     accounts,
     activeAccount,

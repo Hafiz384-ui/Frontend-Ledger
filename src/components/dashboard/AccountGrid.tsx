@@ -8,6 +8,7 @@ interface AccountGridProps {
   accounts: Account[];
   isCreating: boolean;
   hideBalances: boolean;
+  isSystemUser?: boolean;
   onCreateAccount: () => void;
   onOpenDetails: (account: Account) => void;
   onSendMoney: (account: Account) => void;
@@ -20,6 +21,7 @@ export const AccountGrid: React.FC<AccountGridProps> = ({
   accounts,
   isCreating,
   hideBalances,
+  isSystemUser = false,
   onCreateAccount,
   onOpenDetails,
   onSendMoney,
@@ -29,22 +31,26 @@ export const AccountGrid: React.FC<AccountGridProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold tracking-tight text-foreground">
-            Your Bank Accounts
+            {isSystemUser ? "System Reserve Vault" : "Your Bank Accounts"}
           </h2>
           <p className="text-xs text-muted-foreground">
-            Click any account to make it your primary vault or perform actions
+            {isSystemUser
+              ? "System liquidity vault — used exclusively to seed initial capital into user accounts."
+              : "Click any account to make it your primary vault or perform actions"}
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={onCreateAccount}
-          disabled={isCreating}
-          className="flex items-center space-x-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Open Another Account</span>
-        </button>
+        {!isSystemUser && (
+          <button
+            type="button"
+            onClick={onCreateAccount}
+            disabled={isCreating}
+            className="flex items-center space-x-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Open Another Account</span>
+          </button>
+        )}
       </div>
 
       {/* Account Cards Grid */}
@@ -56,6 +62,7 @@ export const AccountGrid: React.FC<AccountGridProps> = ({
           <AccountCard
             key={acc._id}
             account={acc}
+            isSystemUser={isSystemUser}
             hideBalance={hideBalances}
             onOpenDetails={onOpenDetails}
             onSendMoney={onSendMoney}

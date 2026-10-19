@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useAccountStore } from "@/store/useAccountStore";
@@ -18,7 +19,10 @@ import type { Account } from "@/types/account";
  * Clean Single-Responsibility Dashboard Page Orchestrator
  */
 export default function DashboardPage() {
+  const router = useRouter();
   const { user } = useAuthStore();
+  const isSystemUser = Boolean(user?.systemUser);
+
   const {
     accounts,
     activeAccount,
@@ -43,6 +47,14 @@ export default function DashboardPage() {
   }, 0);
 
   const handleCreateAccount = async () => {
+    if (isSystemUser) {
+      toast.error(
+        "System users (Admins) are not allowed to open new accounts.",
+        "Operation Blocked"
+      );
+      return;
+    }
+
     const newAcc = await createAccount();
     if (newAcc) {
       toast.success(
@@ -52,6 +64,18 @@ export default function DashboardPage() {
     } else {
       toast.error("Failed to create account. Please try again.", "Error");
     }
+  };
+
+  const handleInitiateSend = (account: Account) => {
+    if (isSystemUser) {
+      toast.info(
+        "System users cannot perform simple peer-to-peer transfers. Redirecting to Seed Funds panel...",
+        "Admin Seeding"
+      );
+      router.push("/admin");
+      return;
+    }
+    setSendModalAccount(account);
   };
 
   const handleRefreshAll = async () => {
@@ -83,7 +107,8 @@ export default function DashboardPage() {
               accounts={accounts}
               activeAccount={activeAccount}
               totalNetWorth={totalNetWorth}
-              onSendFunds={(account) => setSendModalAccount(account)}
+              isSystemUser={isSystemUser}
+              onSendFunds={handleInitiateSend}
               onViewDetails={(account) => setDetailModalAccount(account)}
             />
 
@@ -91,10 +116,11 @@ export default function DashboardPage() {
             <AccountGrid
               accounts={accounts}
               isCreating={isCreating}
+              isSystemUser={isSystemUser}
               hideBalances={false}
               onCreateAccount={handleCreateAccount}
               onOpenDetails={(account) => setDetailModalAccount(account)}
-              onSendMoney={(account) => setSendModalAccount(account)}
+              onSendMoney={handleInitiateSend}
             />
           </>
         )}
@@ -103,19 +129,22 @@ export default function DashboardPage() {
         <AccountDetailModal
           account={detailModalAccount}
           isOpen={!!detailModalAccount}
+          isSystemUser={isSystemUser}
           onClose={() => setDetailModalAccount(null)}
           onSendMoney={(account) => {
             setDetailModalAccount(null);
-            setSendModalAccount(account);
+            handleInitiateSend(account);
           }}
         />
 
-        <SendMoneyModal
-          account={sendModalAccount}
-          isOpen={!!sendModalAccount}
-          availableBalance={sendModalAccount ? balances[sendModalAccount._id] ?? 0 : 0}
-          onClose={() => setSendModalAccount(null)}
-        />
+        {!isSystemUser && (
+          <SendMoneyModal
+            account={sendModalAccount}
+            isOpen={!!sendModalAccount}
+            availableBalance={sendModalAccount ? balances[sendModalAccount._id] ?? 0 : 0}
+            onClose={() => setSendModalAccount(null)}
+          />
+        )}
       </div>
     </ProtectedRoute>
   );

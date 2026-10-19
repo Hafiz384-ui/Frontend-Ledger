@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   Sparkles,
   Eye,
@@ -7,6 +8,8 @@ import {
   Send,
   Layers,
   Shield,
+  TerminalSquare,
+  ShieldAlert,
 } from "lucide-react";
 import { formatCurrency, maskAccountNumber } from "@/lib/utils";
 import type { Account } from "@/types/account";
@@ -15,6 +18,7 @@ interface PortfolioSummaryCardProps {
   accounts: Account[];
   activeAccount: Account | null;
   totalNetWorth: number;
+  isSystemUser?: boolean;
   onSendFunds: (account: Account) => void;
   onViewDetails: (account: Account) => void;
 }
@@ -26,6 +30,7 @@ export const PortfolioSummaryCard: React.FC<PortfolioSummaryCardProps> = ({
   accounts,
   activeAccount,
   totalNetWorth,
+  isSystemUser = false,
   onSendFunds,
   onViewDetails,
 }) => {
@@ -42,9 +47,15 @@ export const PortfolioSummaryCard: React.FC<PortfolioSummaryCardProps> = ({
         {/* Balance Stats */}
         <div className="space-y-4">
           <div className="flex items-center space-x-3">
-            <div className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center space-x-1.5">
-              <Sparkles className="w-3 h-3" />
-              <span>PRIMARY LIQUIDITY VAULT</span>
+            <div
+              className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
+                isSystemUser
+                  ? "bg-rose-500/10 text-rose-400 border border-rose-500/30"
+                  : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
+              } flex items-center space-x-1.5`}
+            >
+              {isSystemUser ? <ShieldAlert className="w-3 h-3 text-rose-400" /> : <Sparkles className="w-3 h-3" />}
+              <span>{isSystemUser ? "SYSTEM LIQUIDITY RESERVE" : "PRIMARY LIQUIDITY VAULT"}</span>
             </div>
 
             <span className="text-xs text-muted-foreground font-mono">
@@ -56,7 +67,7 @@ export const PortfolioSummaryCard: React.FC<PortfolioSummaryCardProps> = ({
 
           <div className="space-y-1">
             <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              <span>Total Available Portfolio</span>
+              <span>{isSystemUser ? "System Reserve Balance" : "Total Available Portfolio"}</span>
               <button
                 type="button"
                 onClick={() => setHideBalances(!hideBalances)}
@@ -82,20 +93,34 @@ export const PortfolioSummaryCard: React.FC<PortfolioSummaryCardProps> = ({
               <span>Double-Entry Verified</span>
             </div>
             <span>•</span>
-            <span>{accounts.length} Total Bank Vaults</span>
+            <span>
+              {isSystemUser
+                ? "1 System Seeding Vault (Multi-Account Blocked)"
+                : `${accounts.length} Total Bank Vaults`}
+            </span>
           </div>
         </div>
 
         {/* Hero Quick Actions */}
         <div className="flex flex-wrap sm:flex-nowrap items-center gap-3">
-          <button
-            type="button"
-            onClick={() => targetAccount && onSendFunds(targetAccount)}
-            className="flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-5 py-3 rounded-2xl bg-emerald-500 text-slate-950 font-bold text-xs hover:bg-emerald-400 shadow-spatial-glow-emerald transition-all"
-          >
-            <Send className="w-4 h-4" />
-            <span>Send Funds</span>
-          </button>
+          {isSystemUser ? (
+            <Link
+              href="/admin"
+              className="flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-rose-500 to-amber-500 text-slate-950 font-bold text-xs hover:opacity-90 shadow-spatial-glow-rose transition-all"
+            >
+              <TerminalSquare className="w-4 h-4 text-slate-950" />
+              <span>Seed Initial Funds</span>
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => targetAccount && onSendFunds(targetAccount)}
+              className="flex-1 sm:flex-initial flex items-center justify-center space-x-2 px-5 py-3 rounded-2xl bg-emerald-500 text-slate-950 font-bold text-xs hover:bg-emerald-400 shadow-spatial-glow-emerald transition-all"
+            >
+              <Send className="w-4 h-4" />
+              <span>Send Funds</span>
+            </button>
+          )}
 
           <button
             type="button"

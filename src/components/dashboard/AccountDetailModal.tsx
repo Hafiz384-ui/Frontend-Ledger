@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   X,
   ShieldCheck,
@@ -14,6 +15,7 @@ import {
   Lock,
   AlertOctagon,
   AlertCircle,
+  TerminalSquare,
 } from "lucide-react";
 import type { Account, AccountStatus } from "@/types/account";
 import { useAccountStore } from "@/store/useAccountStore";
@@ -23,6 +25,7 @@ import { formatCurrency } from "@/lib/utils";
 interface AccountDetailModalProps {
   account: Account | null;
   isOpen: boolean;
+  isSystemUser?: boolean;
   onClose: () => void;
   onSendMoney: (account: Account) => void;
 }
@@ -30,6 +33,7 @@ interface AccountDetailModalProps {
 export function AccountDetailModal({
   account,
   isOpen,
+  isSystemUser = false,
   onClose,
   onSendMoney,
 }: AccountDetailModalProps) {
@@ -238,18 +242,29 @@ export function AccountDetailModal({
             Close
           </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              onClose();
-              onSendMoney(account);
-            }}
-            disabled={account.status !== "ACTIVE"}
-            className="flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold hover:bg-emerald-400 shadow-spatial-glow-emerald transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <Send className="w-3.5 h-3.5" />
-            <span>Send Money</span>
-          </button>
+          {isSystemUser ? (
+            <Link
+              href="/admin"
+              onClick={onClose}
+              className="flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 text-slate-950 text-xs font-bold hover:opacity-90 shadow-spatial-glow-rose transition-all"
+            >
+              <TerminalSquare className="w-3.5 h-3.5" />
+              <span>Seed Funds (Admin)</span>
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onSendMoney(account);
+              }}
+              disabled={account.status !== "ACTIVE"}
+              className="flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-emerald-500 text-slate-950 text-xs font-bold hover:bg-emerald-400 shadow-spatial-glow-emerald transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Send Money</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -162,17 +162,28 @@ export function Navbar() {
                       )}
                     </div>
                     <div className="pt-2 mt-1 border-t border-border/40">
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          await createAccount();
-                          setAccountDropdownOpen(false);
-                        }}
-                        className="w-full flex items-center justify-center space-x-1.5 py-1.5 px-2 rounded-lg text-xs font-medium text-emerald-400 hover:bg-emerald-500/10 transition-colors"
-                      >
-                        <PlusCircle className="w-3.5 h-3.5" />
-                        <span>Open New Account</span>
-                      </button>
+                      {user?.systemUser ? (
+                        <Link
+                          href="/admin"
+                          onClick={() => setAccountDropdownOpen(false)}
+                          className="w-full flex items-center justify-center space-x-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold text-rose-400 hover:bg-rose-500/10 transition-colors"
+                        >
+                          <TerminalSquare className="w-3.5 h-3.5" />
+                          <span>Admin Seed Panel</span>
+                        </Link>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await createAccount();
+                            setAccountDropdownOpen(false);
+                          }}
+                          className="w-full flex items-center justify-center space-x-1.5 py-1.5 px-2 rounded-lg text-xs font-medium text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+                        >
+                          <PlusCircle className="w-3.5 h-3.5" />
+                          <span>Open New Account</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
