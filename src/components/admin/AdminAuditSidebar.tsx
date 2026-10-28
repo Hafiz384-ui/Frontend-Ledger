@@ -1,5 +1,6 @@
 import React from "react";
-import { Info, Shield, Terminal } from "lucide-react";
+import Link from "next/link";
+import { Info, Shield, Terminal, ShieldCheck, ArrowRight } from "lucide-react";
 
 /**
  * Administrative Audit Sidebar with Operation Guide, Security Notice, and API Spec
@@ -71,6 +72,16 @@ export const AdminAuditSidebar: React.FC = () => {
             </li>
           ))}
         </ul>
+        <div className="pt-2">
+          <Link
+            href="/audit-logs"
+            className="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 hover:text-rose-200 hover:bg-rose-500/25 transition-all text-xs font-bold"
+          >
+            <ShieldCheck className="w-4 h-4 text-rose-400" />
+            <span>Open System Audit Records</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
       </div>
 
       {/* API Reference */}

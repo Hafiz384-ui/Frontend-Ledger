@@ -123,7 +123,8 @@ export function TransferForm({
       ? balances[selectedAccount._id]
       : 0;
 
-  const numericAmount = parseFloat(amount) || 0;
+  const isAmountValidFormat = /^[1-9]\d*(\.\d+)?$/.test(amount.trim());
+  const numericAmount = isAmountValidFormat ? (parseFloat(amount) || 0) : 0;
   const remainingBalance = availableBalance - numericAmount;
 
   // Handle regenerating a new idempotency key manually or after conflict
@@ -205,18 +206,23 @@ export function TransferForm({
     }
 
     if (field === "amount") {
-      const val = parseFloat(value);
-      if (!value || isNaN(val)) {
+      const trimmed = value.trim();
+      if (!trimmed) {
         errors.amount = "Please enter a valid amount";
-      } else if (val < 1) {
-        errors.amount = "Amount must be at least ₹1";
-      } else if (val > availableBalance) {
-        errors.amount = `Insufficient ledger funds. Available balance: ${formatCurrency(
-          availableBalance,
-          selectedAccount?.currency || "INR"
-        )}`;
+      } else if (!/^[1-9]\d*(\.\d+)?$/.test(trimmed)) {
+        errors.amount = "Amount must start with 1 or greater and cannot start with 0";
       } else {
-        delete errors.amount;
+        const val = parseFloat(trimmed);
+        if (isNaN(val) || val < 1) {
+          errors.amount = "Amount must be at least ₹1";
+        } else if (val > availableBalance) {
+          errors.amount = `Insufficient ledger funds. Available balance: ${formatCurrency(
+            availableBalance,
+            selectedAccount?.currency || "INR"
+          )}`;
+        } else {
+          delete errors.amount;
+        }
       }
     }
 
@@ -248,16 +254,21 @@ export function TransferForm({
       errors.toAccount = "Recipient must be a 24-character hexadecimal Account ID";
     }
 
-    const val = parseFloat(amount);
-    if (!amount || isNaN(val)) {
+    const trimmedAmount = amount.trim();
+    if (!trimmedAmount) {
       errors.amount = "Transfer amount is required";
-    } else if (val < 1) {
-      errors.amount = "Minimum transfer amount is ₹1";
-    } else if (val > availableBalance) {
-      errors.amount = `Insufficient ledger balance. Available: ${formatCurrency(
-        availableBalance,
-        selectedAccount?.currency || "INR"
-      )}`;
+    } else if (!/^[1-9]\d*(\.\d+)?$/.test(trimmedAmount)) {
+      errors.amount = "Amount must start with 1 or greater and cannot start with 0";
+    } else {
+      const val = parseFloat(trimmedAmount);
+      if (isNaN(val) || val < 1) {
+        errors.amount = "Minimum transfer amount is ₹1";
+      } else if (val > availableBalance) {
+        errors.amount = `Insufficient ledger balance. Available: ${formatCurrency(
+          availableBalance,
+          selectedAccount?.currency || "INR"
+        )}`;
+      }
     }
 
     setClientErrors(errors);
@@ -748,7 +759,7 @@ export function TransferForm({
             </label>
 
             {/* Live Remaining Balance Calculation */}
-            {numericAmount > 0 && (
+            {numericAmount > 0 && isAmountValidFormat && (
               <span
                 className={`text-[11px] font-mono font-medium ${
                   remainingBalance < 0
@@ -768,15 +779,15 @@ export function TransferForm({
               ₹
             </span>
             <input
-              type="number"
-              min="1"
-              step="any"
+              type="text"
+              inputMode="decimal"
               value={amount}
               onChange={(e) => {
-                setAmount(e.target.value);
-                validateField("amount", e.target.value);
+                const val = e.target.value;
+                setAmount(val);
+                validateField("amount", val);
               }}
-              placeholder="0.00"
+              placeholder="e.g. 500"
               disabled={isSubmitting}
               className={`w-full pl-9 pr-4 py-3 rounded-2xl spatial-glass text-base font-mono font-extrabold border transition-all outline-none focus:ring-2 ${
                 clientErrors.amount

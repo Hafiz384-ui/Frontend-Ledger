@@ -12,13 +12,34 @@ export type TransactionStatus =
   | "REJECTED"
   | "ROLLED_BACK";
 
+export type TransactionDirection =
+  | "SENT"
+  | "RECEIVED"
+  | "SELF"
+  | "TRANSFER"
+  | "SYSTEM_AUDIT";
+
+export interface TransactionAccountRef {
+  _id: string;
+  status: string;
+  currency: string;
+  user?: {
+    _id?: string;
+    username: string;
+    email: string;
+  };
+}
+
 export interface Transaction {
   _id: string;
-  fromAccount: string;
-  toAccount: string;
+  fromAccount: string | TransactionAccountRef;
+  toAccount: string | TransactionAccountRef;
   amount: number;
   idempotencyKey: string;
   status: TransactionStatus;
+  direction?: TransactionDirection;
+  isSender?: boolean;
+  isReceiver?: boolean;
   description?: string;
   createdAt: string;
   updatedAt: string;
@@ -51,9 +72,27 @@ export interface SeedFundsResponse {
   transaction?: Transaction | Record<string, unknown>;
 }
 
+export interface TransactionPagination {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
+export interface TransactionListResponse {
+  success: boolean;
+  transactions: Transaction[];
+  pagination?: TransactionPagination;
+  message?: string;
+}
+
 export interface TransactionQueryParams {
   accountId?: string;
+  page?: number;
   limit?: number;
   skip?: number;
   status?: TransactionStatus;
+  all?: boolean | string;
 }

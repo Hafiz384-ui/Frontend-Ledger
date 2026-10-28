@@ -78,13 +78,22 @@ export const SeedFundsForm: React.FC = () => {
   }, [idempotencyKeyValue]);
 
   const onSubmit = async (data: SeedFundsFormData) => {
+    const amountStr = String(data.amount).trim();
+    if (!/^[1-9]\d*(\.\d+)?$/.test(amountStr) || Number(amountStr) < 1) {
+      toast.error(
+        "Amount must start with 1 or greater and cannot start with 0.",
+        "Validation Failed"
+      );
+      return;
+    }
+
     setIsSubmitting(true);
     setLastResult(null);
 
     try {
       const response = await transactionService.seedInitialFunds({
         toAccount: data.toAccount.trim(),
-        amount: Number(data.amount),
+        amount: Number(amountStr),
         idempotencyKey: data.idempotencyKey,
       });
 
@@ -93,12 +102,12 @@ export const SeedFundsForm: React.FC = () => {
         success: true,
         message:
           response.message ||
-          `Successfully credited ${formatINR(Number(data.amount))} to account.`,
+          `Successfully credited ${formatINR(Number(amountStr))} to account.`,
         txId,
       });
 
       toast.success(
-        `Credited ${formatINR(Number(data.amount))} to ${data.toAccount.slice(0, 8)}...`,
+        `Credited ${formatINR(Number(amountStr))} to ${data.toAccount.slice(0, 8)}...`,
         "Funds Seeded"
       );
 
@@ -185,12 +194,10 @@ export const SeedFundsForm: React.FC = () => {
           </span>
           <input
             id="amount"
-            type="number"
+            type="text"
+            inputMode="decimal"
             {...register("amount")}
-            placeholder="0.00"
-            min={1}
-            max={10000000}
-            step={0.01}
+            placeholder="e.g. 5000"
             className={`w-full pl-8 pr-4 py-3 rounded-xl border bg-card/40 text-sm font-semibold placeholder:text-muted-foreground/40 text-foreground
               focus:outline-none focus:ring-2 focus:ring-emerald-500/40 transition-all
               ${
@@ -200,11 +207,14 @@ export const SeedFundsForm: React.FC = () => {
               }`}
             disabled={isSubmitting}
           />
-          {amountValue && !isNaN(Number(amountValue)) && Number(amountValue) > 0 && (
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-emerald-400 font-medium">
-              {formatINR(Number(amountValue))}
-            </span>
-          )}
+          {amountValue &&
+            !isNaN(Number(amountValue)) &&
+            Number(amountValue) > 0 &&
+            /^[1-9]\d*(\.\d+)?$/.test(String(amountValue).trim()) && (
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-emerald-400 font-medium">
+                {formatINR(Number(amountValue))}
+              </span>
+            )}
         </div>
         {errors.amount && (
           <p className="flex items-center gap-1.5 text-[11px] text-rose-400 font-medium">

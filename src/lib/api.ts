@@ -18,7 +18,7 @@ export const authApi = authService;
 export const accountApi = accountService;
 export const transactionApi = {
   createTransaction: transactionService.createTransaction,
-  getTransactions: transactionService.getTransactions,
+  getTransactions: transactionService.getTransactionHistory,
 };
 export const systemApi = {
   seedInitialFunds: transactionService.seedInitialFunds,

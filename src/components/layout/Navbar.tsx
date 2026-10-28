@@ -16,6 +16,8 @@ import {
   X,
   PlusCircle,
   TerminalSquare,
+  FileText,
+  Activity,
 } from "lucide-react";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -67,10 +69,10 @@ export function Navbar() {
                 Dashboard
               </Link>
               <Link
-                href="/accounts"
+                href="/transfers"
                 className="px-3 py-1.5 text-xs font-medium rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
               >
-                Accounts
+                Transfers
               </Link>
               <Link
                 href="/transactions"
@@ -79,10 +81,11 @@ export function Navbar() {
                 Ledger
               </Link>
               <Link
-                href="/transfers"
-                className="px-3 py-1.5 text-xs font-medium rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                href="/audit-logs"
+                className="px-3 py-1.5 text-xs font-medium rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors flex items-center gap-1.5"
               >
-                Transfers
+                <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Audit Logs</span>
               </Link>
               {/* Admin Panel -- only visible to system users */}
               {user?.systemUser && (
@@ -248,13 +251,23 @@ export function Navbar() {
 
                     <div className="py-2 space-y-1">
                       <Link
-                        href="/profile"
+                        href="/transactions"
                         onClick={() => setProfileDropdownOpen(false)}
                         className="flex items-center space-x-2.5 px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
                       >
-                        <UserIcon className="w-3.5 h-3.5 text-muted-foreground" />
-                        <span>Security & Profile</span>
+                        <Layers className="w-3.5 h-3.5 text-muted-foreground" />
+                        <span>Transaction Ledger</span>
                       </Link>
+
+                      <Link
+                        href="/audit-logs"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="flex items-center space-x-2.5 px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
+                      >
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Security & Audit Trail</span>
+                      </Link>
+
                       {/* Admin Panel link -- system users only */}
                       {user?.systemUser && (
                         <Link
@@ -263,7 +276,7 @@ export function Navbar() {
                           className="flex items-center space-x-2.5 px-2.5 py-1.5 rounded-lg text-xs text-rose-400 hover:bg-rose-500/10 transition-colors font-semibold"
                         >
                           <TerminalSquare className="w-3.5 h-3.5" />
-                          <span>Admin Panel</span>
+                          <span>Admin Control Panel</span>
                         </Link>
                       )}
                     </div>
@@ -326,11 +339,11 @@ export function Navbar() {
             Dashboard
           </Link>
           <Link
-            href="/accounts"
+            href="/transfers"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50"
           >
-            Accounts
+            Transfers
           </Link>
           <Link
             href="/transactions"
@@ -340,11 +353,11 @@ export function Navbar() {
             Ledger
           </Link>
           <Link
-            href="/transfers"
+            href="/audit-logs"
             onClick={() => setMobileMenuOpen(false)}
             className="block px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50"
           >
-            Transfers
+            Audit Logs
           </Link>
           {/* Admin Panel -- only visible to system users */}
           {user?.systemUser && (

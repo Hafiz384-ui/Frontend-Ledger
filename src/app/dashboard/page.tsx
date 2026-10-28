@@ -12,6 +12,7 @@ import AccountGrid from "@/components/dashboard/AccountGrid";
 import EmptyAccountState from "@/components/dashboard/EmptyAccountState";
 import AccountDetailModal from "@/components/dashboard/AccountDetailModal";
 import SendMoneyModal from "@/components/dashboard/SendMoneyModal";
+import RecentTransactionsWidget from "@/components/dashboard/RecentTransactionsWidget";
 import { DashboardGridSkeleton } from "@/components/ui/SkeletonLoaders";
 import type { Account } from "@/types/account";
 
@@ -122,6 +123,9 @@ export default function DashboardPage() {
               onOpenDetails={(account) => setDetailModalAccount(account)}
               onSendMoney={handleInitiateSend}
             />
+
+            {/* Live Activity & Transaction History Widget */}
+            <RecentTransactionsWidget />
           </>
         )}
 

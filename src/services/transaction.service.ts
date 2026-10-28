@@ -4,6 +4,7 @@ import type {
   SeedFundsRequest,
   SeedFundsResponse,
   Transaction,
+  TransactionListResponse,
   TransactionQueryParams,
   TransactionResponse,
 } from "@/types/transaction";
@@ -27,16 +28,20 @@ export const transactionService = {
   },
 
   /**
-   * Retrieve historical transactions, optionally filtered by accountId or pagination limit
+   * Retrieve full paginated transaction history with sent/received direction and metadata
    */
-  getTransactions: async (params?: TransactionQueryParams): Promise<Transaction[]> => {
-    const response = await apiClient.get<{ transactions: Transaction[] } | Transaction[]>("/api/transactions", {
+  getTransactionHistory: async (params?: TransactionQueryParams): Promise<TransactionListResponse> => {
+    const response = await apiClient.get<TransactionListResponse | Transaction[]>("/api/transactions", {
       params,
     });
+
     if (Array.isArray(response.data)) {
-      return response.data;
+      return {
+        success: true,
+        transactions: response.data,
+      };
     }
-    return (response.data as { transactions?: Transaction[] }).transactions || [];
+    return response.data as TransactionListResponse;
   },
 
   /**
