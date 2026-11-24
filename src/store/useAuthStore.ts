@@ -28,6 +28,24 @@ const syncTokenToCookie = (token: string | null) => {
     document.cookie = `banking_token=${token}; path=/; max-age=604800; SameSite=Lax`;
   } else {
     document.cookie = "banking_token=; path=/; max-age=0";
+    document.cookie = "token=; path=/; max-age=0";
+  }
+};
+
+/**
+ * Checks if a JWT token is expired on the client side
+ */
+export const isTokenExpired = (token: string | null): boolean => {
+  if (!token) return true;
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return true;
+    const payload = JSON.parse(atob(parts[1]));
+    if (!payload.exp) return false;
+    // Exp is in seconds; check with a 10s leeway
+    return Date.now() >= (payload.exp * 1000 - 10000);
+  } catch (_) {
+    return true;
   }
 };
 
@@ -122,6 +140,7 @@ export const useAuthStore = create<AuthState>()(
 
       handleUnauthorized: () => {
         localStorage.removeItem("banking_token");
+        localStorage.removeItem("banking_auth_store");
         syncTokenToCookie(null);
         set({
           user: null,
@@ -142,6 +161,13 @@ export const useAuthStore = create<AuthState>()(
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
+          // If token exists but is expired, invalidate immediately upon rehydration
+          if (state.token && isTokenExpired(state.token)) {
+            state.handleUnauthorized();
+            state.setHasHydrated(true);
+            return;
+          }
+
           state.setHasHydrated(true);
           // Sync existing token to cookie if exists
           if (state.token) {

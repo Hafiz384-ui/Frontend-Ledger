@@ -12,16 +12,18 @@ interface GuestRouteProps {
 export function GuestRoute({ children }: GuestRouteProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated, hasHydrated } = useAuthStore();
+  const { isAuthenticated, hasHydrated, token } = useAuthStore();
+  const isExpired = Boolean(searchParams.get("expired"));
 
   useEffect(() => {
-    if (hasHydrated && isAuthenticated) {
-      const redirect = searchParams.get("redirect") || "/";
+    // If not expired and actually authenticated, redirect to app
+    if (hasHydrated && isAuthenticated && token && !isExpired) {
+      const redirect = searchParams.get("redirect") || "/dashboard";
       router.replace(redirect);
     }
-  }, [hasHydrated, isAuthenticated, router, searchParams]);
+  }, [hasHydrated, isAuthenticated, token, isExpired, router, searchParams]);
 
-  if (!hasHydrated || isAuthenticated) {
+  if (!hasHydrated || (isAuthenticated && token && !isExpired)) {
     return (
       <GlobalLoader message="Authenticated session active. Redirecting to dashboard..." />
     );

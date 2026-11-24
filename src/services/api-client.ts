@@ -66,7 +66,9 @@ apiClient.interceptors.response.use(
         if (typeof window !== "undefined") {
           localStorage.removeItem("banking_token");
           localStorage.removeItem("banking_user");
+          localStorage.removeItem("banking_auth_store");
           document.cookie = "banking_token=; path=/; max-age=0";
+          document.cookie = "token=; path=/; max-age=0";
 
           // Notify global Zustand stores and subscribers
           window.dispatchEvent(
@@ -78,9 +80,9 @@ apiClient.interceptors.response.use(
           // Redirect to login screen if outside auth flows
           const currentPath = window.location.pathname;
           if (!currentPath.includes("/login") && !currentPath.includes("/register")) {
-            window.location.href = `/login?expired=true&message=${encodeURIComponent(
+            window.location.replace(`/login?expired=true&message=${encodeURIComponent(
               serverMessage || "Session expired. Please log in again."
-            )}`;
+            )}`);
           }
         }
         break;

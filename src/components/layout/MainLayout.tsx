@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import { AlertCircle, ShieldAlert, X } from "lucide-react";
 import ToastContainer from "@/components/ui/Toast";
@@ -10,8 +11,12 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
+  const pathname = usePathname();
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [toastType, setToastType] = useState<"warning" | "error">("error");
+
+  // Determine whether current route is an authentication flow (login / register)
+  const isAuthPage = pathname === "/login" || pathname === "/register";
 
   useEffect(() => {
     // Listen for custom global API events dispatched by interceptors
@@ -38,8 +43,8 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground flex flex-col spatial-ambient-mesh">
-      {/* Top Navbar */}
-      <Navbar />
+      {/* Top Navbar - Hidden on Login & Register pages */}
+      {!isAuthPage && <Navbar />}
 
       {/* Global Notification Banner if 401 or 403 occurs */}
       {toastMessage && (
@@ -71,22 +76,24 @@ export function MainLayout({ children }: MainLayoutProps) {
       )}
 
       {/* Primary Page Canvas */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <main className={`flex-1 w-full ${isAuthPage ? "flex flex-col justify-center p-4 sm:p-6" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10"}`}>
         {children}
       </main>
 
-      {/* Spatial Banking Footer */}
-      <footer className="border-t border-border/40 spatial-glass py-6 mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>End-to-End Encrypted Financial Core</span>
+      {/* Spatial Banking Footer - Hidden on Login & Register pages */}
+      {!isAuthPage && (
+        <footer className="border-t border-border/40 spatial-glass py-6 mt-auto">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>End-to-End Encrypted Financial Core</span>
+            </div>
+            <p className="text-xs text-muted-foreground/80">
+              &copy; {new Date().getFullYear()} AURA Banking Network. Double-entry verified.
+            </p>
           </div>
-          <p className="text-xs text-muted-foreground/80">
-            &copy; {new Date().getFullYear()} AURA Banking Network. Double-entry verified.
-          </p>
-        </div>
-      </footer>
+        </footer>
+      )}
 
       {/* Global Glassmorphic Toast Notifications */}
       <ToastContainer />

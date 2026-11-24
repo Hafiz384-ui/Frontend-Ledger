@@ -129,7 +129,7 @@ export function Navbar() {
 
                 {/* Account Switcher Dropdown */}
                 {accountDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-64 rounded-xl spatial-glass p-2 shadow-2xl border border-border/80 z-50 animate-fadeIn">
+                  <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-card/95 backdrop-blur-2xl p-3 shadow-2xl border border-border/90 z-50 animate-fadeIn ring-1 ring-black/10 dark:ring-white/10">
                     <div className="px-2 py-1.5 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                       Select Active Account
                     </div>
@@ -227,44 +227,55 @@ export function Navbar() {
                   <ChevronDown className="w-3 h-3 text-muted-foreground hidden sm:inline" />
                 </button>
 
-                {/* Profile Menu Dropdown */}
+                {/* Profile Menu Dropdown / Slider */}
                 {profileDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-64 rounded-xl spatial-glass p-3 shadow-2xl border border-border/80 z-50 animate-fadeIn">
-                    <div className="pb-3 border-b border-border/40">
-                      <p className="text-xs font-semibold text-foreground truncate">
-                        {user?.username}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground truncate">
-                        {user?.email}
-                      </p>
-                      <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                        Verified Active Session
-                      </div>
-                      {user?.systemUser && (
-                        <div className="mt-1.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                          <TerminalSquare className="w-2.5 h-2.5" />
-                          System Operator
+                  <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-card/95 backdrop-blur-2xl p-4 shadow-2xl border border-border/90 z-50 animate-fadeIn ring-1 ring-black/10 dark:ring-white/10">
+                    <div className="pb-3 border-b border-border/60">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-400 p-[1px] shadow-sm">
+                          <div className="w-full h-full rounded-[11px] bg-background flex items-center justify-center font-bold text-sm text-emerald-400">
+                            {user?.username ? user.username.charAt(0).toUpperCase() : "U"}
+                          </div>
                         </div>
-                      )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-foreground truncate">
+                            {user?.username}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {user?.email}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-2.5 flex flex-wrap gap-1.5">
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          Verified Active Session
+                        </div>
+                        {user?.systemUser && (
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                            <TerminalSquare className="w-2.5 h-2.5" />
+                            System Operator
+                          </div>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="py-2 space-y-1">
+                    <div className="py-2.5 space-y-1">
                       <Link
                         href="/transactions"
                         onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center space-x-2.5 px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
+                        className="flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-muted transition-colors"
                       >
-                        <Layers className="w-3.5 h-3.5 text-muted-foreground" />
+                        <Layers className="w-4 h-4 text-emerald-400" />
                         <span>Transaction Ledger</span>
                       </Link>
 
                       <Link
                         href="/audit-logs"
                         onClick={() => setProfileDropdownOpen(false)}
-                        className="flex items-center space-x-2.5 px-2.5 py-1.5 rounded-lg text-xs text-foreground/80 hover:bg-muted hover:text-foreground transition-colors"
+                        className="flex items-center space-x-3 px-3 py-2 rounded-xl text-xs font-medium text-foreground hover:bg-muted transition-colors"
                       >
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                        <ShieldCheck className="w-4 h-4 text-emerald-400" />
                         <span>Security & Audit Trail</span>
                       </Link>
 
@@ -273,15 +284,15 @@ export function Navbar() {
                         <Link
                           href="/admin"
                           onClick={() => setProfileDropdownOpen(false)}
-                          className="flex items-center space-x-2.5 px-2.5 py-1.5 rounded-lg text-xs text-rose-400 hover:bg-rose-500/10 transition-colors font-semibold"
+                          className="flex items-center space-x-3 px-3 py-2 rounded-xl text-xs text-rose-400 hover:bg-rose-500/10 transition-colors font-semibold"
                         >
-                          <TerminalSquare className="w-3.5 h-3.5" />
+                          <TerminalSquare className="w-4 h-4" />
                           <span>Admin Control Panel</span>
                         </Link>
                       )}
                     </div>
 
-                    <div className="pt-2 border-t border-border/40">
+                    <div className="pt-2 border-t border-border/60">
                       <button
                         type="button"
                         onClick={async () => {
@@ -290,9 +301,9 @@ export function Navbar() {
                           toast.info("You have been securely signed out.", "Session Ended");
                           router.push("/login");
                         }}
-                        className="w-full flex items-center space-x-2.5 px-2.5 py-1.5 rounded-lg text-xs text-rose-500 hover:bg-rose-500/10 transition-colors font-medium"
+                        className="w-full flex items-center space-x-3 px-3 py-2 rounded-xl text-xs text-rose-500 hover:bg-rose-500/10 transition-colors font-semibold"
                       >
-                        <LogOut className="w-3.5 h-3.5 text-rose-500" />
+                        <LogOut className="w-4 h-4 text-rose-500" />
                         <span>Log Out</span>
                       </button>
                     </div>
